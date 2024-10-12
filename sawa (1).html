@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
   
   <head>
@@ -15,13 +15,20 @@
 
     <script>
       let ctlR = document.querySelector('#ctlR').object3D;
-      // let ctlL = document.querySelector('#ctlL').object3D;
-      let startR = new THREE.Vector3(ctlR);
-      let startL = new THREE.Vector3(ctlL);
-      let isPressed = false;
+      let ctlL = document.querySelector('#ctlL').object3D;
+      let startR = new THREE.Vector3();
+      let startL = new THREE.Vector3();
+      let isPressedR = false;
+      let isPressedL = false;
 
-      
+      // 色（好きな色増やしてOK）
+      let listR = ['red','blue','green'];
+      let listL = ['red','blue','green'];
+      Rcolor = 0;
+      Lcolor = 1;
 
+
+      // 描画する関数
       function updateLine(ctlId, start, color) {
         let ctl = document.querySelector(`#${ctlId}`).object3D;
         let end = new THREE.Vector3().copy(ctl.position);
@@ -30,27 +37,53 @@
         draw.setAttribute('line', `color:${color}; start:${start.x} ${start.y} ${start.z}; end:${end.x} ${end.y} ${end.z};`);
         start.copy(end);
                 
-        
         let scene = document.querySelector('a-scene');
         scene.appendChild(draw); // シーンに追加（表示）
       }
 
       setInterval(function() {
-        if(isPressed){
-          updateLine('ctlR', startR, 'orange'); // 右手で線を描画
-        // updateLine('ctlL', startL, 'blue');   // 左手で線を描画
+        if (isPressedR) {
+          updateLine('ctlR', startR, listR[Rcolor]); // 右手で線を描画
         }
-        console.log(startR);
+        if (isPressedL) {
+          updateLine('ctlL', startL, listL[Lcolor]); // 左手で線を描画
+        }
       }, 100);
 
-      $('#ctlR').on('abuttondown triggerdown', function() {//AボタンDown トリガーDown
-      		isPressed = true;
-          startR.copy(ctlR.position);
-    	});
-    	
-    	$('#ctlR').on('abuttonup triggerup', function() {//AボタンUP トリガーUP
-      		isPressed = false;
-    	});
+
+      $('#ctlR').on('triggerdown', function() { // 右手のトリガーDown
+        isPressedR = true;
+        startR.copy(ctlR.position); // 線の引き始めを初期化
+      });
+      
+      $('#ctlL').on('triggerdown', function() { // 左手のトリガーDown
+        isPressedL = true;
+        startL.copy(ctlL.position); // 線の引き始めを初期化
+      });
+      
+      $('#ctlR').on('triggerup', function() { // 右手のトリガーUp
+        isPressedR = false;
+      });
+      
+      $('#ctlL').on('triggerup', function() { // 左手のトリガーUp
+        isPressedL = false;
+      });
+
+
+      $('#ctlR').on('thumbstickdown', function() { // 右手のAボタンDown
+        Rcolor++;
+        if(Rcolor >= listR.length){
+          Rcolor = 0;
+        }
+      });
+      console.log(Rcolor);
+      $('#ctlL').on('thumbstickdown', function() { // 左手のAボタンDown
+        Lcolor++;
+        if(Lcolor >= listL.length){
+          Lcolor = 0;
+        }
+      });
+      
     </script>
   </body>
 </html>
