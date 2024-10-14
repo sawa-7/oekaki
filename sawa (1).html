@@ -70,14 +70,14 @@
       });
 
 
-      $('#ctlR').on('thumbstickdown', function() { // 右手のAボタンDown
+      $('#ctlR').on('abuttondown thumbstickdown', function() { // 右手のAボタンDown
         Rcolor++;
         if(Rcolor >= listR.length){
           Rcolor = 0;
         }
       });
       console.log(Rcolor);
-      $('#ctlL').on('thumbstickdown', function() { // 左手のAボタンDown
+      $('#ctlL').on('abuttonup thumbstickdown', function() { // 左手のAボタンDown
         Lcolor++;
         if(Lcolor >= listL.length){
           Lcolor = 0;
