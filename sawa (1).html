@@ -11,54 +11,69 @@
     <a-scene physics="driver: ammo" cursor="rayOrigin: mouse">
       <a-entity id="ctlR" laser-controls="hand: right" raycaster="showLine: false;"></a-entity>
       <a-entity id="ctlL" laser-controls="hand: left" raycaster="showLine: false;"></a-entity>
+
+      <a-text id="txtR" value="RightColor:red" position="1 4 -3" color="red"></a-text>
+      <a-text id="txtL" value="LeftColor:blue" position="-2 4 -3" color="blue"></a-text>
+
     </a-scene>
 
+
+    
     <script>
       let ctlR = document.querySelector('#ctlR').object3D;
       let ctlL = document.querySelector('#ctlL').object3D;
-      let startR = new THREE.Vector3();
-      let startL = new THREE.Vector3();
+      let posR = new THREE.Vector3();
+      let posL = new THREE.Vector3();
       let isPressedR = false;
       let isPressedL = false;
 
-      // 色（好きな色増やしてOK）
-      let listR = ['red','blue','green'];
-      let listL = ['red','blue','green'];
+      // 色
+      let listR = ['red','blue','green','black'];
+      let listL = ['red','blue','green','black'];
       Rcolor = 0;
       Lcolor = 1;
 
 
       // 描画する関数
-      function updateLine(ctlId, start, color) {
+      function updateLine(ctlId, pos, color) {
         let ctl = document.querySelector(`#${ctlId}`).object3D;
-        let end = new THREE.Vector3().copy(ctl.position);
+        pos.copy(ctl.position);
 
-        let draw = document.createElement('a-entity'); // 動的生成
-        draw.setAttribute('line', `color:${color}; start:${start.x} ${start.y} ${start.z}; end:${end.x} ${end.y} ${end.z};`);
-        start.copy(end);
+        let draw = document.createElement('a-sphere'); // 動的生成
+        draw.setAttribute('radius', '0.03'); 
+        draw.setAttribute('position', `${pos.x} ${pos.y} ${pos.z}`); 
+        draw.setAttribute('color', color); 
                 
         let scene = document.querySelector('a-scene');
         scene.appendChild(draw); // シーンに追加（表示）
+        
       }
+
 
       setInterval(function() {
         if (isPressedR) {
-          updateLine('ctlR', startR, listR[Rcolor]); // 右手で線を描画
+          updateLine('ctlR', posR, listR[Rcolor]); // 右手で線を描画
         }
         if (isPressedL) {
-          updateLine('ctlL', startL, listL[Lcolor]); // 左手で線を描画
+          updateLine('ctlL', posL, listL[Lcolor]); // 左手で線を描画
         }
-      }, 100);
+
+        // text変更
+        txtR.setAttribute('value', 'RightColor:' + listR[Rcolor]);
+        txtR.setAttribute('color', listR[Rcolor]);
+        txtL.setAttribute('value', 'LeftColor:' + listL[Lcolor]);
+        txtL.setAttribute('color', listL[Lcolor]);
+      }, 0.01);
 
 
       $('#ctlR').on('triggerdown', function() { // 右手のトリガーDown
         isPressedR = true;
-        startR.copy(ctlR.position); // 線の引き始めを初期化
+        // posR.copy(ctlR.position); // 線の引き始めを初期化
       });
       
       $('#ctlL').on('triggerdown', function() { // 左手のトリガーDown
         isPressedL = true;
-        startL.copy(ctlL.position); // 線の引き始めを初期化
+        // posL.copy(ctlL.position); // 線の引き始めを初期化
       });
       
       $('#ctlR').on('triggerup', function() { // 右手のトリガーUp
@@ -70,14 +85,14 @@
       });
 
 
-      $('#ctlR').on('abuttondown thumbstickdown', function() { // 右手のAボタンDown
+      $('#ctlR').on('thumbstickdown', function() { //右サムスティック
         Rcolor++;
         if(Rcolor >= listR.length){
           Rcolor = 0;
         }
       });
-      console.log(Rcolor);
-      $('#ctlL').on('abuttonup thumbstickdown', function() { // 左手のAボタンDown
+
+      $('#ctlL').on('thumbstickdown', function() { //左サムスティック
         Lcolor++;
         if(Lcolor >= listL.length){
           Lcolor = 0;
